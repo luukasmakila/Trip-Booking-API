@@ -1,7 +1,7 @@
 from email.policy import HTTP
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
-from models import Trip
+from models import Trip, EditTrip
 import helpers, uuid
 
 #initializes the app
@@ -88,6 +88,30 @@ async def get_trip(uuid: str):
   
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip': trip})
 
+#Edits trip's passangers and recalculates price
+@app.put('/api/trips/{uuid}')
+async def edit_passangers(uuid: str, editTrip: EditTrip):
+  try:
+    trip = await helpers.get_one_trip(uuid)
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'An error occurred getting the trip info'})
+  
+  if not trip:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
+
+  #Changes
+  trip['passangers'] = editTrip.passangers
+  trip['items'] = editTrip.items
+  trip['price'] = float(trip['price'])  * len(editTrip.passangers)
+
+  try:
+    await helpers.edit_trip(trip)
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'failed to edit the trip'})
+
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'success': 'trip edited successfully'})
+  
+#Deletes a booked trip based on id
 @app.delete('/api/trips/{uuid}')
 async def delete_trip(uuid):
 

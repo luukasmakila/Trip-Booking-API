@@ -4,5 +4,9 @@ from typing import Optional
 #Model for trips
 class Trip(BaseModel):
   passangers  : list
-  items       : Optional[int] = 0
+  items       : Optional[str] = ''
   destination : str
+
+class EditTrip(BaseModel):
+  passangers : list
+  items      : str

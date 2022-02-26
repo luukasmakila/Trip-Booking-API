@@ -50,6 +50,7 @@ async def get_info(destinationId: str):
   except:
     return False
 
+#Deletes a booked trip based on id
 async def delete_trip(tripId: str):
   try:
     with open('trips.json', 'r') as file:
@@ -63,6 +64,22 @@ async def delete_trip(tripId: str):
         json.dump(trips, file)
         file.close()
     
+    return True
+  except:
+    return False
+
+async def edit_trip(editedTrip):
+  try:
+    trips = await load_data('trips.json')
+    for trip in trips:
+      if trip['id'] == editedTrip['id']:
+        trips.remove(trip)
+        trips.append(editedTrip)
+    
+    with open('trips.json', 'w') as file:
+      json.dump(trips, file)
+      file.close()
+  
     return True
   except:
     return False
