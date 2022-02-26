@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 from models import Trip
-import helpers
+import helpers, uuid
 
 #initializes the app
 app = FastAPI()
@@ -31,5 +31,24 @@ async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int]
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations})
 
 @app.post('/api/trips')
-async def add_trip():
-  pass
+async def add_trip(trip: Trip):
+
+  #Generates the universally unique identifier for the trip
+  gID = str(uuid.uuid1())
+  
+  booked_trip = {
+    'id'          : gID,
+    'passangers'  : trip.passangers,
+    'items'       : trip.items,
+    'destination' : trip.destination
+  }
+
+  print(booked_trip)
+
+  #Book the trip
+  try:
+    await helpers.add_trip(booked_trip)
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Failed to book the trip'})
+  
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': f'Trip id: {gID}'})
