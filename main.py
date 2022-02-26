@@ -65,3 +65,18 @@ async def add_trip(trip: Trip):
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Failed to book the trip'})
   
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': f'Trip id: {gID}'})
+
+#Get individual trip info
+@app.get('/api/trips/{uuid}')
+async def get_trip(uuid: str):
+
+  #try to the get trip info
+  try:
+    trip = await helpers.get_one_trip(uuid)
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'An error occurred getting the trip info'})
+  
+  if not trip:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
+  
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip': trip})
