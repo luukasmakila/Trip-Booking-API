@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 import helpers
 
@@ -22,4 +22,7 @@ async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int]
   if type and type == 'moon':
     destinations = [destination for destination in destinations if destination['isPlanet'] == False]
 
-  return {'destinations': destinations}
+  if destinations == []:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'No destinations match your criteria'})
+
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations})
