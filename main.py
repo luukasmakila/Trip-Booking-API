@@ -51,11 +51,15 @@ async def add_trip(trip: Trip):
   #Generates the universally unique identifier for the trip
   gID = str(uuid.uuid1())
   
+  price = await helpers.get_price(trip.destination)
+  trip_price = round(len(trip.passangers) * float(price), 2)
+
   booked_trip = {
     'id'          : gID,
     'passangers'  : trip.passangers,
     'items'       : trip.items,
-    'destination' : trip.destination
+    'destination' : trip.destination,
+    'price'       : trip_price
   }
 
   #Book the trip

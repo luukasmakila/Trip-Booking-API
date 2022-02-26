@@ -38,3 +38,16 @@ async def get_one_trip(tripId: str):
     return False
   except:
     return False
+
+async def get_price(destinationId: str):
+
+  try:
+    #Get all destinations
+    destinations = await load_data('planets.json')
+
+    #Query for price
+    for destination in destinations:
+      if destination['id'] == destinationId:
+        return destination['price']
+  except:
+    return False

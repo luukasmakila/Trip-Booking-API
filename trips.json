@@ -1,1 +1,1 @@
-[{"id": "c5a6110b-96fe-11ec-ae5a-b07d64f3b131", "passangers": ["Luukas"], "items": 3, "destination": "saturn"}, {"id": "31a8ce31-96ff-11ec-9bc7-b07d64f3b131", "passangers": ["Esa, Justus"], "items": 4, "destination": "uranus"}]
+[{"id": "55efa5a0-9706-11ec-b5a6-b07d64f3b131", "passangers": ["Luukas", "Esa", "Justus"], "items": 3, "destination": "phobos", "price": 391.17}]
