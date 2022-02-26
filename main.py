@@ -7,13 +7,15 @@ import helpers, uuid
 app = FastAPI()
 
 #API endpoints
-
 #Get all destinations
 @app.get('/api/destinations')
 async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int] = None, type: Optional[str] = None):
 
   #get destination data
-  destinations = await helpers.load_data('planets.json')
+  try:
+    destinations = await helpers.load_data('planets.json')
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Error getting destinations'})
 
   #query based on if parameters are given
   if maxTemp:
@@ -30,6 +32,19 @@ async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int]
 
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations})
 
+#Endpoint for getting booked trips
+@app.get('/api/trips')
+async def get_booked_trips():
+
+  #get booked trips
+  try:
+    booked_trips = await helpers.load_data('trips.json')
+  except:
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Could not get booked trips'})
+  
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Booked trips': booked_trips})
+
+#Endpoint for booking trips
 @app.post('/api/trips')
 async def add_trip(trip: Trip):
 
@@ -42,8 +57,6 @@ async def add_trip(trip: Trip):
     'items'       : trip.items,
     'destination' : trip.destination
   }
-
-  print(booked_trip)
 
   #Book the trip
   try:
