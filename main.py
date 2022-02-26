@@ -1,3 +1,4 @@
+from email.policy import HTTP
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 from models import Trip
@@ -86,3 +87,13 @@ async def get_trip(uuid: str):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
   
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip': trip})
+
+@app.delete('/api/trips/{uuid}')
+async def delete_trip(uuid):
+
+  try:
+    await helpers.delete_trip(uuid)
+  except:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'description': 'Trip not found'})
+  
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Description': 'Successful deletion'})

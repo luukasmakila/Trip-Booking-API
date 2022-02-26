@@ -25,7 +25,6 @@ async def add_trip(booked_trip: dict):
     return False
 
 async def get_one_trip(tripId: str):
-
   try:
     #Load all trip info
     trips = await load_data('trips.json')
@@ -40,7 +39,6 @@ async def get_one_trip(tripId: str):
     return False
 
 async def get_info(destinationId: str):
-
   try:
     #Get all destinations
     destinations = await load_data('planets.json')
@@ -49,5 +47,22 @@ async def get_info(destinationId: str):
     for destination in destinations:
       if destination['id'] == destinationId:
         return {'price': destination['price'], 'name': destination['name']}
+  except:
+    return False
+
+async def delete_trip(tripId: str):
+  try:
+    with open('trips.json', 'r') as file:
+      trips = json.load(file)
+    
+    for trip in trips:
+      if trip['id'] == tripId:
+        trips.remove(trip)
+    
+    with open('trips.json', 'w') as file:
+        json.dump(trips, file)
+        file.close()
+    
+    return True
   except:
     return False
