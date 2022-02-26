@@ -1,11 +1,14 @@
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
+from models import Trip
 import helpers
 
 #initializes the app
 app = FastAPI()
 
 #API endpoints
+
+#Get all destinations
 @app.get('/api/destinations')
 async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int] = None, type: Optional[str] = None):
 
@@ -26,3 +29,7 @@ async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int]
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'No destinations match your criteria'})
 
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations})
+
+@app.post('/api/trips')
+async def add_trip():
+  pass
