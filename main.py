@@ -51,15 +51,17 @@ async def add_trip(trip: Trip):
   #Generates the universally unique identifier for the trip
   gID = str(uuid.uuid1())
   
-  price = await helpers.get_price(trip.destination)
-  trip_price = round(len(trip.passangers) * float(price), 2)
+  #get destination price and name
+  info = await helpers.get_info(trip.destination)
+  trip_price = round(len(trip.passangers) * float(info['price']), 2)
 
   booked_trip = {
-    'id'          : gID,
-    'passangers'  : trip.passangers,
-    'items'       : trip.items,
-    'destination' : trip.destination,
-    'price'       : trip_price
+    'id'            : gID,
+    'passangers'    : trip.passangers,
+    'items'         : trip.items,
+    'destinationId' : trip.destination,
+    'destination'   : info['name'],
+    'price'         : trip_price
   }
 
   #Book the trip
@@ -68,7 +70,7 @@ async def add_trip(trip: Trip):
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Failed to book the trip'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': f'Trip id: {gID}'})
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': {'passangers': trip.passangers, 'items': trip.items, 'destinationId': trip.destination}})
 
 #Get individual trip info
 @app.get('/api/trips/{uuid}')

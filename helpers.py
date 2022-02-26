@@ -39,7 +39,7 @@ async def get_one_trip(tripId: str):
   except:
     return False
 
-async def get_price(destinationId: str):
+async def get_info(destinationId: str):
 
   try:
     #Get all destinations
@@ -48,6 +48,6 @@ async def get_price(destinationId: str):
     #Query for price
     for destination in destinations:
       if destination['id'] == destinationId:
-        return destination['price']
+        return {'price': destination['price'], 'name': destination['name']}
   except:
     return False

@@ -1,1 +1,1 @@
-[{"id": "55efa5a0-9706-11ec-b5a6-b07d64f3b131", "passangers": ["Luukas", "Esa", "Justus"], "items": 3, "destination": "phobos", "price": 391.17}]
+[{"id": "ac0ffcf7-9707-11ec-be5d-b07d64f3b131", "passangers": ["Luukas", "Esa", "Justus"], "items": 3, "destinationId": "phobos", "destination": "Phobos", "price": 391.17}]
