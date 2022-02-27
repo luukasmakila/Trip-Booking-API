@@ -53,15 +53,15 @@ async def add_trip(trip: Trip):
   gID = str(uuid.uuid1())
   
   #get destination price and name
-  info = await helpers.get_info(trip.destination)
-  trip_price = round(len(trip.passangers) * float(info['price']), 2)
+  trip_info = await helpers.get_info(trip.destination)
+  trip_price = round(len(trip.passangers) * float(trip_info['price']), 2)
 
   booked_trip = {
     'id'            : gID,
     'passangers'    : trip.passangers,
     'items'         : trip.items,
     'destinationId' : trip.destination,
-    'destination'   : info['name'],
+    'destination'   : trip_info['name'],
     'price'         : trip_price
   }
 
@@ -81,7 +81,7 @@ async def get_trip(uuid: str):
   try:
     trip = await helpers.get_one_trip(uuid)
   except:
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'An error occurred getting the trip info'})
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
   
   if not trip:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
@@ -91,19 +91,22 @@ async def get_trip(uuid: str):
 #Edits trip's passangers and recalculates price
 @app.put('/api/trips/{uuid}')
 async def edit_passangers(uuid: str, editTrip: EditTrip):
+
+  #Get the booked trip to be edited
   try:
     trip = await helpers.get_one_trip(uuid)
   except:
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'An error occurred getting the trip info'})
-  
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})  
+
   if not trip:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
 
-  #Changes
+  #Changes to the trip
   trip['passangers'] = editTrip.passangers
   trip['items'] = editTrip.items
   trip['price'] = float(trip['price'])  * len(editTrip.passangers)
 
+  #Edit the existing booked trip
   try:
     await helpers.edit_trip(trip)
   except:
@@ -115,6 +118,7 @@ async def edit_passangers(uuid: str, editTrip: EditTrip):
 @app.delete('/api/trips/{uuid}')
 async def delete_trip(uuid):
 
+  #Delete the trip from JSON file
   try:
     await helpers.delete_trip(uuid)
   except:
