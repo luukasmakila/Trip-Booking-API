@@ -10,7 +10,7 @@ Created a trip booking API for space traveling using the FastAPI framework. </br
   5. After the server is running open http://localhost:8000/docs on your browser (Chrome is reccomended)
   6. Here you can see all the API endpoints and send test requests to them by opening one of the routes and clicking "Try it out" and then execute
   7. You can also view the BaseModel schemas created for trips
-  8. Now if you want to run the tests i've created cd into the folder and run: pytest
+  8. Now if you want to run the tests i've created cd into the folder and run: <b>pytest</b>
   9. For edit and delete trip tests you will need to provide a valid uuid for the trip manually (sorry)
 
 # I went with FastAPI for the following reasons: </br>
