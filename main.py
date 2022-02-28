@@ -1,6 +1,7 @@
-from email.policy import HTTP
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
+
+from itsdangerous import json
 from models import Trip, EditTrip
 import helpers, uuid
 
@@ -10,28 +11,34 @@ app = FastAPI()
 #API endpoints
 #Get all destinations
 @app.get('/api/destinations')
-async def get_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int] = None, type: Optional[str] = None):
+async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int] = None, type: Optional[str] = None):
+  data = await helpers.fetch_all('https://api.le-systeme-solaire.net/rest/bodies/')
+  destinations = data.json()
 
-  #get destination data
-  try:
-    destinations = await helpers.load_data('planets.json')
-  except:
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Error getting destinations'})
+  if await helpers.destinations_exist():
+    destinations_info = await helpers.load_data('destinations.json')
+  else:
+    #create the destinations.json so if the /api/destinations is refreshed
+    #we dont have to calculate the prices again every single time
+    destinations_info = await helpers.calculate_all(destinations)
 
-  #query based on if parameters are given
+    #then write the json file
+    await helpers.write_destinations(destinations_info)
+
+  #filter the destinations based on query params
   if maxTemp:
-    destinations = [destination for destination in destinations if destination['avgTemp'] <= maxTemp]
+    destinations_info = [destination for destination in destinations_info if destination['avgTemp'] <= maxTemp]
   if minTemp:
-    destinations = [destination for destination in destinations if destination['avgTemp'] >= minTemp]
+    destinations_info = [destination for destination in destinations_info if destination['avgTemp'] >= minTemp]
   if type and type == 'planet':
-    destinations = [destination for destination in destinations if destination['isPlanet'] == True]
+    destinations_info = [destination for destination in destinations_info if destination['isPlanet'] == True]
   if type and type == 'moon':
-    destinations = [destination for destination in destinations if destination['isPlanet'] == False]
-
-  if destinations == []:
+    destinations_info = [destination for destination in destinations_info if destination['isPlanet'] == False]
+  
+  if destinations_info == []:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'No destinations match your criteria'})
 
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations})
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations_info})
 
 #Endpoint for getting booked trips
 @app.get('/api/trips')

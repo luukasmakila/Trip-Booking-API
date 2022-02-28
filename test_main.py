@@ -1,4 +1,3 @@
-from urllib import response
 from main import app
 from fastapi.testclient import TestClient
 
@@ -35,10 +34,10 @@ def test_edit_trip():
   }
 
   #uuid must match an existing trips id
-  response = client.put('/api/trips/6a9605c9-981a-11ec-b0ab-b07d64f3b131', json=trip_edit)
+  response = client.put('/api/trips/7a06f5ef-981a-11ec-81e5-b07d64f3b131', json=trip_edit)
 
   assert response.status_code == 200
 
 def test_delete_trip():
-  response = client.delete('/api/trips/6a9605c9-981a-11ec-b0ab-b07d64f3b131')
+  response = client.delete('/api/trips/7a06f5ef-981a-11ec-81e5-b07d64f3b131')
   assert response.status_code == 200

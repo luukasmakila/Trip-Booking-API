@@ -1,6 +1,18 @@
-import json
+import json, requests, os
 
 #contains all the helper functions
+
+#check if destinations.json has been made
+async def destinations_exist():
+  return os.path.exists('destinations.json')
+
+#fetch all data
+async def fetch_all(url: str):
+  return requests.get(url)
+
+#fetch one pice of data
+async def fetch_one(url):
+  return requests.get(url)
 
 #loads data from a JSON file (could be a db in production)
 async def load_data(path: str):
@@ -32,7 +44,7 @@ async def get_one_trip(tripId: str):
 
 async def get_info(destinationId: str):
   #Get all destinations
-  destinations = await load_data('planets.json')
+  destinations = await load_data('destinations.json')
 
   #Query for price
   for destination in destinations:
@@ -53,7 +65,7 @@ async def delete_trip(tripId: str):
       file.close()
 
 #helper function for trip editing
-async def edit_trip(editedTrip):
+async def edit_trip(editedTrip: dict):
   trips = await load_data('trips.json')
   for trip in trips:
     if trip['id'] == editedTrip['id']:
@@ -62,4 +74,72 @@ async def edit_trip(editedTrip):
   
   with open('trips.json', 'w') as file:
     json.dump(trips, file)
+    file.close()
+
+#calculates the price for non moons
+async def calculate_planet(planet):
+  distance = (planet['perihelion'] + planet['aphelion']) / 2
+  
+  if planet['moons'] == None:
+    number_of_moons = 0
+  else:
+    number_of_moons = len(planet['moons'])
+  
+  price = distance * planet['avgTemp']
+  final_price = (price + (number_of_moons * (price * 0.072))) / 100000000
+  return round(final_price, 2)
+
+#calculates price for moon bookings
+async def calculate_moon(moon):
+  orbits = moon['aroundPlanet']
+
+  #get the planet that the moo is orbitings
+  response = await fetch_one(orbits['rel'])
+  planet = response.json()
+
+  distance = (planet['perihelion'] + planet['aphelion']) / 2
+  
+  if planet['moons'] == None:
+    number_of_moons = 0
+  else:
+    number_of_moons = len(planet['moons'])
+  
+  price = distance * moon['avgTemp']
+  final_price = (price + (number_of_moons * (price * 0.072))) / 100000000
+  return round(final_price, 2)
+
+#calculate prices for all destinations
+async def calculate_all(destinations):
+  #holds the price and other info for destinations
+  destinations_info = []
+
+  #Stores the price for a moon orbiting a certain planet
+  #Saves computing power after the price is calculated once
+  moon_price_for = {}
+
+  for destination in destinations['bodies']:
+    #if avgTemp == 0 change it to 50
+    if destination['avgTemp'] == 0:
+      destination['avgTemp'] = 50
+
+    if destination['isPlanet'] == False and destination['aroundPlanet'] != None:
+      #Is a moon and a planet can have many moons so theres no reason to calculate the moon price multiple times
+      #so lets keep track of the price for a moon for a certain planet and use that
+      #number every time we see a moon for that planet
+      if destination['aroundPlanet']['planet'] not in moon_price_for:
+        price = await calculate_moon(destination)
+        moon_price_for[destination['aroundPlanet']['planet']] = price
+      else:
+        price = moon_price_for[destination['aroundPlanet']['planet']]
+    else:
+      #Not a moon so we do a normal calculation
+      price = await calculate_planet(destination)
+    
+    destinations_info.append({'id': destination['id'], 'name': destination['name'], 'price': price, 'isPlanet': destination['isPlanet'], 'avgTemp': destination['avgTemp']})
+  
+  return destinations_info
+
+async def write_destinations(destinations_info):
+  with open('destinations.json', 'w') as file:
+    json.dump(destinations_info, file)
     file.close()
