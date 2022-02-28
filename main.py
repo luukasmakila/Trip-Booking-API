@@ -9,7 +9,7 @@ app = FastAPI()
 #API endpoints
 #Get all destinations
 @app.get('/api/destinations')
-async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[int] = None, type: Optional[str] = None):
+async def get_all_destinations(maxTemp: Optional[int] = 10**9, minTemp: Optional[int] = 0, type: Optional[str] = None):
   data = await helpers.fetch_all('https://api.le-systeme-solaire.net/rest/bodies/')
   destinations = data.json()
 
@@ -23,12 +23,9 @@ async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[
 
     #then write the json file
     await helpers.write_destinations(destinations_info)
-
+  
   #filter the destinations based on query params
-  if maxTemp:
-    destinations_info = [destination for destination in destinations_info if destination['avgTemp'] <= maxTemp]
-  if minTemp:
-    destinations_info = [destination for destination in destinations_info if destination['avgTemp'] >= minTemp]
+  destinations_info = [destination for destination in destinations_info if destination['avgTemp'] >= minTemp and destination['avgTemp'] <= maxTemp]
   if type and type == 'planet':
     destinations_info = [destination for destination in destinations_info if destination['isPlanet'] == True]
   if type and type == 'moon':
