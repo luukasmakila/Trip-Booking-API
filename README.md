@@ -4,16 +4,16 @@ Created a trip booking API for space traveling using the FastAPI framework. </br
 
 # How to use?:
   1. Download the repository to your machine
-  2. Check the requirements.txt and install the required packages
-  3. cd into the folder and run: uvicorn main:app / uvicorn main:app --reload (for developement mode)
-  4. If step 2 doesn't work run: python -m uvicorn main:app --reload
+  2. Check the requirements.txt and install the required packages (in project folder type: <b>pip install -r requirements.txt</b>)
+  3. cd into the folder and run: <b>uvicorn main:app</b> / <b>uvicorn main:app --reload</b> (for developement mode)
+  4. If step 2 doesn't work run: <b>python -m uvicorn main:app --reload</b>
   5. After the server is running open http://localhost:8000/docs on your browser (Chrome is reccomended)
   6. Here you can see all the API endpoints and send test requests to them by opening one of the routes and clicking "Try it out" and then execute
   7. You can also view the BaseModel schemas created for trips
-  8. Now if you want to run the tests i've created cd into the folder and run: pytest
+  8. Now if you want to run the tests i've created cd into the folder and run: <b>pytest</b>
   9. For edit and delete trip tests you will need to provide a valid uuid for the trip manually (sorry)
 
-# Even though I had never used FastAPI before I wanted to use it for the following reasons: </br>
+# I went with FastAPI for the following reasons: </br>
   1. To challenge myself and learn a new amazing framework companies actually use in production
   2. FastAPI is the fastest python web framework
   3. Simple and fast to code out
