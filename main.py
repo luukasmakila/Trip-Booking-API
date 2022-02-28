@@ -1,7 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
-
-from itsdangerous import json
 from models import Trip, EditTrip
 import helpers, uuid
 
@@ -15,11 +13,12 @@ async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[
   data = await helpers.fetch_all('https://api.le-systeme-solaire.net/rest/bodies/')
   destinations = data.json()
 
-  if await helpers.destinations_exist():
+  #check whether the destinations.json exists or not
+  if await helpers.json_exists('destinations.json'):
     destinations_info = await helpers.load_data('destinations.json')
   else:
     #create the destinations.json so if the /api/destinations is refreshed
-    #we dont have to calculate the prices again every single time
+    #we dont have to calculate the prices again every single time (saves a couple of seconds)
     destinations_info = await helpers.calculate_all(destinations)
 
     #then write the json file
@@ -44,6 +43,10 @@ async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[
 @app.get('/api/trips')
 async def get_booked_trips():
 
+  #Check if trips.json exists
+  if not await helpers.json_exists('trips.json'):
+    await helpers.write_trips()
+
   #get booked trips
   try:
     booked_trips = await helpers.load_data('trips.json')
@@ -55,6 +58,9 @@ async def get_booked_trips():
 #Endpoint for booking trips
 @app.post('/api/trips')
 async def add_trip(trip: Trip):
+
+  if not await helpers.json_exists('trips.json'):
+    await helpers.write_trips()
 
   #Generates the universally unique identifier for the trip
   gID = str(uuid.uuid1())

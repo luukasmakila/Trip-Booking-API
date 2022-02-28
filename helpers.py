@@ -1,10 +1,10 @@
 import json, requests, os
 
-#contains all the helper functions
+#Contains all the helper functions
 
 #check if destinations.json has been made
-async def destinations_exist():
-  return os.path.exists('destinations.json')
+async def json_exists(fileName):
+  return os.path.exists(fileName)
 
 #fetch all data
 async def fetch_all(url: str):
@@ -139,7 +139,14 @@ async def calculate_all(destinations):
   
   return destinations_info
 
+#Functions to initialize json files are here
 async def write_destinations(destinations_info):
   with open('destinations.json', 'w') as file:
     json.dump(destinations_info, file)
+    file.close()
+
+async def write_trips():
+  with open('trips.json', 'w') as file:
+    #We want to be able to book new trips so i will initialize trips.json with an empty list
+    json.dump([], file)
     file.close()
