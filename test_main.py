@@ -25,6 +25,7 @@ def test_book_trip():
   response = client.post('/api/trips', json=trip)
 
   assert response.status_code == 200
+  assert type(response.json()) == dict
 
 def test_edit_trip():
   
@@ -34,10 +35,13 @@ def test_edit_trip():
   }
 
   #uuid must match an existing trips id
-  response = client.put('/api/trips/7a06f5ef-981a-11ec-81e5-b07d64f3b131', json=trip_edit)
+  response = client.put('/api/trips/d70dc76b-98b3-11ec-bc8a-b07d64f3b131', json=trip_edit)
 
   assert response.status_code == 200
+  assert type(response.json()) == dict
 
 def test_delete_trip():
-  response = client.delete('/api/trips/7a06f5ef-981a-11ec-81e5-b07d64f3b131')
+  response = client.delete('/api/trips/d70dc76b-98b3-11ec-bc8a-b07d64f3b131')
+
   assert response.status_code == 200
+  assert type(response.json()) == dict

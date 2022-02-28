@@ -35,7 +35,7 @@ async def get_all_destinations(maxTemp: Optional[int] = None, minTemp: Optional[
     destinations_info = [destination for destination in destinations_info if destination['isPlanet'] == False]
   
   if destinations_info == []:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'No destinations match your criteria'})
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'invalid request'})
 
   raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations_info})
 
@@ -84,7 +84,7 @@ async def add_trip(trip: Trip):
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Failed to book the trip'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': {'passangers': trip.passangers, 'items': trip.items, 'destinationId': trip.destination}})
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': {'id': gID, 'status': 'OK'}})
 
 #Get individual trip info
 @app.get('/api/trips/{uuid}')
@@ -94,7 +94,7 @@ async def get_trip(uuid: str):
   try:
     trip = await helpers.get_one_trip(uuid)
   except:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Invalid request'})
   
   if not trip:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
@@ -111,9 +111,6 @@ async def edit_passangers(uuid: str, editTrip: EditTrip):
   except:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})  
 
-  if not trip:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
-
   #Changes to the trip
   trip['passangers'] = editTrip.passangers
   trip['items'] = editTrip.items
@@ -125,7 +122,7 @@ async def edit_passangers(uuid: str, editTrip: EditTrip):
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'failed to edit the trip'})
 
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'success': 'trip edited successfully'})
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'success': 'Trip updated', 'uuid': uuid, 'passangers': trip['passangers'], 'totalPrice': trip['price']})
   
 #Deletes a booked trip based on id
 @app.delete('/api/trips/{uuid}')
@@ -137,4 +134,4 @@ async def delete_trip(uuid):
   except:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'description': 'Trip not found'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Description': 'Successful deletion'})
+  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Description': 'Successful deletion', 'message': 'OK'})
