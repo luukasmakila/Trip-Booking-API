@@ -111,10 +111,13 @@ async def edit_passangers(uuid: str, editTrip: EditTrip):
   except:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})  
 
+  #price for one person
+  price = trip['price'] / len(trip['passangers'])
+
   #Changes to the trip
   trip['passangers'] = editTrip.passangers
   trip['items'] = editTrip.items
-  trip['price'] = float(trip['price'])  * len(editTrip.passangers)
+  trip['price'] = float(price) * len(editTrip.passangers)
 
   #Edit the existing booked trip
   try:
