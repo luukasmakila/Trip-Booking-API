@@ -1,3 +1,4 @@
+from email.policy import HTTP
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 from models import Trip, EditTrip
@@ -61,9 +62,13 @@ async def add_trip(trip: Trip):
 
   #Generates the universally unique identifier for the trip
   gID = str(uuid.uuid1())
-  
+
   #get destination price and name
   trip_info = await helpers.get_info(trip.destination)
+
+  if not trip_info:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'destination is invalid'})
+    
   trip_price = round(len(trip.passangers) * float(trip_info['price']), 2)
 
   booked_trip = {
