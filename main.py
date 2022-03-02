@@ -34,7 +34,7 @@ async def get_all_destinations(maxTemp: Optional[int] = 10**9, minTemp: Optional
   if destinations_info == []:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'invalid request'})
 
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Destinations': destinations_info})
+  return {'Destinations': destinations_info}
 
 #Endpoint for getting booked trips
 @app.get('/api/trips')
@@ -50,7 +50,7 @@ async def get_booked_trips():
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Could not get booked trips'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Booked trips': booked_trips})
+  return {'Booked trips': booked_trips}
 
 #Endpoint for booking trips
 @app.post('/api/trips')
@@ -85,7 +85,7 @@ async def add_trip(trip: Trip):
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'Failed to book the trip'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip booked successfully': {'id': gID, 'status': 'OK'}})
+  return {'Trip booked successfully': {'id': gID, 'status': 'OK'}}
 
 #Get individual trip info
 @app.get('/api/trips/{uuid}')
@@ -100,7 +100,7 @@ async def get_trip(uuid: str):
   if not trip:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'error': 'Trip not found'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Trip': trip})
+  return {'Trip': trip}
 
 #Edits trip's passangers and recalculates price
 @app.put('/api/trips/{uuid}')
@@ -126,7 +126,7 @@ async def edit_passangers(uuid: str, editTrip: EditTrip):
   except:
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={'error': 'failed to edit the trip'})
 
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'success': 'Trip updated', 'uuid': uuid, 'passangers': trip['passangers'], 'totalPrice': trip['price']})
+  return {'success': 'Trip updated', 'uuid': uuid, 'passangers': trip['passangers'], 'totalPrice': trip['price']}
   
 #Deletes a booked trip based on id
 @app.delete('/api/trips/{uuid}')
@@ -138,4 +138,4 @@ async def delete_trip(uuid):
   except:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail={'description': 'Trip not found'})
   
-  raise HTTPException(status_code=status.HTTP_200_OK, detail={'Description': 'Successful deletion', 'message': 'OK'})
+  return {'Description': 'Successful deletion', 'message': 'OK'}

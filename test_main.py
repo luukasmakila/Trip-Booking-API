@@ -1,5 +1,6 @@
 from main import app
 from fastapi.testclient import TestClient
+import helpers, json
 
 client = TestClient(app)
 
@@ -28,6 +29,10 @@ def test_book_trip():
   assert type(response.json()) == dict
 
 def test_edit_trip():
+
+  #find an existing trip id
+  trips = json.load(open('trips.json'))
+  existing_tripId = trips[0]['id']
   
   trip_edit = {
     'passangers' : ['Luukas', 'Esa'],
@@ -35,13 +40,18 @@ def test_edit_trip():
   }
 
   #uuid must match an existing trips id
-  response = client.put('/api/trips/d70dc76b-98b3-11ec-bc8a-b07d64f3b131', json=trip_edit)
+  response = client.put(f'/api/trips/{existing_tripId}', json=trip_edit)
 
   assert response.status_code == 200
   assert type(response.json()) == dict
 
 def test_delete_trip():
-  response = client.delete('/api/trips/d70dc76b-98b3-11ec-bc8a-b07d64f3b131')
+
+  #find an existing trip id
+  trips = json.load(open('trips.json'))
+  existing_tripId = trips[0]['id']
+
+  response = client.delete(f'/api/trips/{existing_tripId}')
 
   assert response.status_code == 200
   assert type(response.json()) == dict
