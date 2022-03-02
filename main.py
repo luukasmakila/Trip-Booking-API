@@ -1,4 +1,3 @@
-from email.policy import HTTP
 from fastapi import FastAPI, HTTPException, status
 from typing import Optional
 from models import Trip, EditTrip
